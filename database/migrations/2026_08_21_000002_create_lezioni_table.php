@@ -10,7 +10,12 @@ return new class extends Migration
     {
         Schema::create('lezioni', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignUuid('studente_id')->constrained('studenti')->cascadeOnUpdate()->restrictOnDelete();
+            // Se uno studente viene eliminato, vengono eliminate anche tutte le sue lezioni.
+            // L'aggiornamento dell'identificativo viene propagato alle lezioni collegate.
+            $table->foreignUuid('studente_id')
+                ->constrained('studenti')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
             $table->date('data')->index();
             $table->time('ora_inizio');
             $table->time('ora_fine');
