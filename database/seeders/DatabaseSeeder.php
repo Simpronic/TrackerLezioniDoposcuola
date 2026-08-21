@@ -16,7 +16,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        if (! app()->environment('local')) { return; }
+        if (! app()->environment('local')) {
+            return;
+        }
 
         $student = Student::create([
             'nome' => 'Giulia', 'cognome' => 'Bianchi', 'anno_ingresso' => now()->year,
@@ -31,7 +33,7 @@ class DatabaseSeeder extends Seeder
             Lesson::create([
                 'studente_id' => $student->id, 'data' => today()->addDays($days),
                 'ora_inizio' => '15:00', 'ora_fine' => '16:30', 'argomento' => 'Matematica · equazioni e problemi',
-                'stato' => $status, 'tariffa_oraria_applicata' => 22, 'fatturata' => $paid,
+                'stato' => $status, 'tariffa_oraria_applicata' => 22, 'da_fatturare' => true, 'fatturata' => $paid,
                 'numero_fattura' => $paid ? 'F-'.abs($days) : null,
                 'data_fattura' => $paid ? today()->addDays($days + 1) : null,
                 'stato_fattura' => $paid ? 'pagata' : null,

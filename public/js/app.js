@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Menu compatto per schermi piccoli.
   const toggle = document.querySelector('.nav-toggle');
   const nav = document.querySelector('.nav-links');
   toggle?.addEventListener('click', () => {
@@ -6,26 +7,55 @@ document.addEventListener('DOMContentLoaded', () => {
     toggle.setAttribute('aria-expanded', String(open));
   });
 
+  // Conferma preventiva per i form che eseguono azioni distruttive.
   document.querySelectorAll('[data-confirm]').forEach(form => form.addEventListener('submit', event => {
     if (!window.confirm(form.dataset.confirm)) event.preventDefault();
   }));
 
+  // Comunica che il registro è in preparazione; il timeout riabilita il pulsante
+  // perché un download non provoca una nuova navigazione della pagina corrente.
+  document.querySelectorAll('.export-form').forEach(form => form.addEventListener('submit', () => {
+    const button = form.querySelector('button');
+    if (!button) return;
+    const originalLabel = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Preparazione…';
+    window.setTimeout(() => {
+      button.disabled = false;
+      button.textContent = originalLabel;
+    }, 15000);
+  }));
+
+  // Propone la tariffa dello studente solo quando la tariffa della lezione è vuota.
   const student = document.querySelector('#studentSelect');
   const rate = document.querySelector('#lessonRate');
   student?.addEventListener('change', () => {
     if (!rate.value) rate.value = student.selectedOptions[0]?.dataset.rate || '';
   });
 
+  // Attenua visivamente i campi fattura finché la lezione non risulta fatturata.
   const invoiceToggle = document.querySelector('#invoicedToggle');
   const invoiceFields = document.querySelector('#invoiceFields');
   const syncInvoice = () => invoiceFields?.classList.toggle('is-muted', !invoiceToggle?.checked);
   invoiceToggle?.addEventListener('change', syncInvoice); syncInvoice();
+
+  // L'invio a Calendar è consentito soltanto per una lezione programmata.
+  const lessonStatus = document.querySelector('#lessonStatus');
+  const calendarFields = document.querySelector('#calendarFields');
+  const calendarToggle = document.querySelector('#calendarToggle');
+  const syncCalendarAvailability = () => {
+    const available = lessonStatus?.value === 'programmata';
+    calendarFields?.classList.toggle('is-muted', !available);
+    if (calendarToggle) calendarToggle.disabled = !available;
+  };
+  lessonStatus?.addEventListener('change', syncCalendarAvailability); syncCalendarAvailability();
 
   const canvas = document.querySelector('#revenueChart');
   if (canvas && window.dashboardSeries) drawChart(canvas, window.dashboardSeries);
 });
 
 function drawChart(canvas, series) {
+  // Grafico Canvas senza dipendenze esterne: grigio=maturato, verde=incassato.
   if (!series.length) { canvas.hidden = true; document.querySelector('#chartEmpty').hidden = false; return; }
   const ratio = window.devicePixelRatio || 1, width = canvas.clientWidth, height = canvas.clientHeight;
   canvas.width = width * ratio; canvas.height = height * ratio;

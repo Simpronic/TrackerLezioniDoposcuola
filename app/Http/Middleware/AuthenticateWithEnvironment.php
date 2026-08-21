@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AuthenticateWithEnvironment
 {
+    /** Protegge tutte le pagine applicative verificando il flag impostato al login. */
     public function handle(Request $request, Closure $next): Response
     {
         if (! $request->session()->get('env_authenticated', false)) {

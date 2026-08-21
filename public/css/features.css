@@ -1,0 +1,59 @@
+.field-help {
+    display: block;
+    margin: 6px 0 0 27px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.export-form {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+}
+
+.export-form select {
+    width: auto;
+    min-width: 105px;
+    margin: 0;
+    padding: 8px;
+}
+
+.export-form .button {
+    padding: 9px 12px;
+}
+
+.billing-tag {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 5px 9px;
+    white-space: nowrap;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.billing-tag.invoiced {
+    color: var(--green);
+    background: var(--green-soft);
+}
+
+.billing-tag.billable {
+    color: var(--amber);
+    background: var(--amber-soft);
+}
+
+.billing-tag.not-billable {
+    color: var(--muted);
+    background: #eeeae3;
+}
+
+.calendar-link {
+    display: inline-block;
+    margin: 12px 0 0 27px;
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 700;
+}
