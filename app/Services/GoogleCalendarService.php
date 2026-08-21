@@ -76,7 +76,7 @@ class GoogleCalendarService
         $description = array_filter([
             $lesson->argomento ? 'Argomento: '.$lesson->argomento : null,
             $lesson->note ? 'Note: '.$lesson->note : null,
-            'Lezione gestita da Lezioni in ordine.',
+            'Lezione gestita da Trak your lesson',
         ]);
 
         return [
