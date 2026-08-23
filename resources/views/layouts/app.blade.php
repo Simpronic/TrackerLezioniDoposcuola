@@ -15,6 +15,7 @@
     <nav class="nav-links" aria-label="Navigazione principale">
         <a @class(['active' => request()->routeIs('dashboard')]) href="{{ route('dashboard') }}">Panoramica</a>
         <a @class(['active' => request()->routeIs('lezioni.*')]) href="{{ route('lezioni.index') }}">Lezioni</a>
+        <a @class(['active' => request()->routeIs('fatturazione.*')]) href="{{ route('fatturazione.index') }}">Fatturazione</a>
         <a @class(['active' => request()->routeIs('studenti.*')]) href="{{ route('studenti.index') }}">Studenti</a>
         <form action="{{ route('logout') }}" method="post">@csrf<button class="link-button">Esci</button></form>
     </nav>

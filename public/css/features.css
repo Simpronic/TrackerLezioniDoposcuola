@@ -57,3 +57,47 @@
     font-size: 13px;
     font-weight: 700;
 }
+
+.inline-help {
+    display: block;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 400;
+}
+
+.billing-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.billing-summary article {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+}
+
+.billing-summary span {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.billing-summary strong {
+    font-family: Georgia, serif;
+    font-size: 26px;
+    font-weight: 400;
+}
+
+@media (max-width: 650px) {
+    .billing-summary { grid-template-columns: 1fr; }
+}

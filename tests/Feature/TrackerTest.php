@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Lesson;
 use App\Models\Student;
 use App\Services\GoogleCalendarService;
+use App\Services\InvoiceNumberSuggester;
 use App\Services\StudentWorkbookExporter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -126,5 +127,62 @@ class TrackerTest extends TestCase
         Http::assertSent(fn ($request) => $request->method() === 'PUT'
             && $request->url() === 'https://www.googleapis.com/calendar/v3/calendars/primary/events/google-event-123');
         Http::assertSentCount(4);
+    }
+
+    public function test_invoice_number_is_suggested_from_the_yearly_sequence(): void
+    {
+        $student = Student::create([
+            'nome' => 'Ada', 'cognome' => 'Rossi', 'anno_ingresso' => 2026,
+            'attivo' => true, 'tariffa_oraria' => 25,
+        ]);
+
+        foreach (['3/2026', '8/2026', '8/2026'] as $index => $invoiceNumber) {
+            Lesson::create([
+                'studente_id' => $student->id,
+                'data' => '2026-09-'.str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
+                'ora_inizio' => '15:00', 'ora_fine' => '16:00', 'stato' => 'svolta',
+                'tariffa_oraria_applicata' => 25, 'da_fatturare' => true, 'fatturata' => true,
+                'numero_fattura' => $invoiceNumber, 'data_fattura' => '2026-09-10',
+            ]);
+        }
+
+        $this->assertSame('9/2026', app(InvoiceNumberSuggester::class)->next(2026));
+        $this->assertSame('1/2027', app(InvoiceNumberSuggester::class)->next(2027));
+    }
+
+    public function test_billing_page_lists_only_completed_billable_lessons_by_default(): void
+    {
+        $student = Student::create([
+            'nome' => 'Ada', 'cognome' => 'Rossi', 'anno_ingresso' => 2026,
+            'attivo' => true, 'tariffa_oraria' => 25,
+        ]);
+
+        foreach ([
+            ['argomento' => 'Da fatturare', 'stato' => 'svolta', 'da_fatturare' => true, 'fatturata' => false],
+            ['argomento' => 'Gratuita', 'stato' => 'svolta', 'da_fatturare' => false, 'fatturata' => false],
+            ['argomento' => 'Programmata', 'stato' => 'programmata', 'da_fatturare' => true, 'fatturata' => false],
+            ['argomento' => 'Già fatturata', 'stato' => 'svolta', 'da_fatturare' => true, 'fatturata' => true],
+        ] as $index => $values) {
+            Lesson::create($values + [
+                'studente_id' => $student->id,
+                'data' => '2026-10-'.str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
+                'ora_inizio' => '15:00', 'ora_fine' => '16:00',
+                'tariffa_oraria_applicata' => 25,
+            ]);
+        }
+
+        $this->withSession(['env_authenticated' => true])
+            ->get('/fatturazione')
+            ->assertOk()
+            ->assertSee('Da fatturare')
+            ->assertDontSee('Gratuita')
+            ->assertDontSee('Programmata')
+            ->assertDontSee('Già fatturata');
+
+        $this->withSession(['env_authenticated' => true])
+            ->get('/fatturazione?fatturazione=fatturate')
+            ->assertOk()
+            ->assertSee('Già fatturata')
+            ->assertDontSee('Gratuita');
     }
 }

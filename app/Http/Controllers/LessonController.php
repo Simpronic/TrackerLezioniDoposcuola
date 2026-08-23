@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Lesson;
 use App\Models\Student;
 use App\Services\GoogleCalendarService;
+use App\Services\InvoiceNumberSuggester;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -70,7 +71,13 @@ class LessonController extends Controller
 
     private function form(Lesson $lesson): View
     {
-        return view('lessons.form', ['lesson' => $lesson, 'students' => Student::orderByDesc('attivo')->orderBy('cognome')->get()]);
+        $invoiceYear = ($lesson->data_fattura ?? $lesson->data ?? today())->year;
+
+        return view('lessons.form', [
+            'lesson' => $lesson,
+            'students' => Student::orderByDesc('attivo')->orderBy('cognome')->get(),
+            'suggestedInvoiceNumber' => app(InvoiceNumberSuggester::class)->next($invoiceYear),
+        ]);
     }
 
     private function validated(Request $request): array

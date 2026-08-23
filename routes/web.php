@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\StudentController;
@@ -15,6 +16,7 @@ Route::middleware('guest')->group(function (): void {
 // Tutte le funzioni e i dati del tracker sono protetti dal login configurato nel .env.
 Route::middleware('env.auth')->group(function (): void {
     Route::get('/', DashboardController::class)->name('dashboard');
+    Route::get('/fatturazione', BillingController::class)->name('fatturazione.index');
     Route::get('/studenti/{student}/export-excel', [StudentController::class, 'export'])->name('studenti.export');
     Route::resource('studenti', StudentController::class)->except('show');
     Route::resource('lezioni', LessonController::class)->except('show');

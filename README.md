@@ -2,6 +2,8 @@
 
 Applicazione Laravel per registrare lezioni di doposcuola, studenti, pagamenti, fatture e statistiche sugli incassi. Permette inoltre di scaricare, per ogni studente e anno scolastico, un registro basato sul modello Excel incluso.
 
+La descrizione di architettura, cartelle, database e flussi applicativi è disponibile in [docs/STRUTTURA_TECNICA.md](docs/STRUTTURA_TECNICA.md).
+
 ## Funzioni principali
 
 - Gestione di studenti e lezioni.
