@@ -261,6 +261,7 @@ class TrackerTest extends TestCase
             ->assertSessionHas('success');
 
         $connection = GoogleCalendarConnection::query()->findOrFail(1);
+        $this->assertSame(1, $connection->id);
         $this->assertSame('new-refresh-token', $connection->refresh_token);
         $this->assertNotSame('new-refresh-token', $connection->getRawOriginal('refresh_token'));
 

@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class GoogleCalendarConnection extends Model
 {
-    protected $fillable = ['refresh_token', 'connected_at'];
+    /** La connessione è un record singleton creato esplicitamente con ID 1. */
+    public $incrementing = false;
+
+    protected $keyType = 'int';
+
+    protected $fillable = ['id', 'refresh_token', 'connected_at'];
 
     protected function casts(): array
     {
