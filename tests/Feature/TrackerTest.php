@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\GoogleCalendarConnection;
 use App\Models\Lesson;
 use App\Models\Student;
 use App\Services\GoogleCalendarService;
 use App\Services\InvoiceNumberSuggester;
+use App\Services\StudentStatistics;
 use App\Services\StudentWorkbookExporter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -184,5 +186,100 @@ class TrackerTest extends TestCase
             ->assertOk()
             ->assertSee('Già fatturata')
             ->assertDontSee('Gratuita');
+    }
+
+    public function test_student_statistics_distinguish_paid_lessons_and_debts(): void
+    {
+        $student = Student::create([
+            'nome' => 'Ada', 'cognome' => 'Rossi', 'anno_ingresso' => 2026,
+            'attivo' => true, 'tariffa_oraria' => 20,
+        ]);
+
+        foreach ([
+            ['stato' => 'svolta', 'ora_fine' => '16:00', 'da_fatturare' => true, 'data_pagamento' => '2026-08-20'],
+            ['stato' => 'svolta', 'ora_fine' => '17:00', 'da_fatturare' => true, 'data_pagamento' => null],
+            ['stato' => 'annullata', 'ora_fine' => '16:00', 'da_fatturare' => true, 'data_pagamento' => null],
+            ['stato' => 'svolta', 'ora_fine' => '16:00', 'da_fatturare' => false, 'data_pagamento' => null],
+        ] as $index => $values) {
+            Lesson::create($values + [
+                'studente_id' => $student->id,
+                'data' => '2026-08-'.str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
+                'ora_inizio' => '15:00', 'tariffa_oraria_applicata' => 20,
+                'fatturata' => false,
+            ]);
+        }
+
+        $statistics = app(StudentStatistics::class)->for($student);
+
+        $this->assertSame(3, $statistics['completed']);
+        $this->assertSame(1, $statistics['cancelled']);
+        $this->assertSame(20.0, $statistics['paid_total']);
+        $this->assertSame(1, $statistics['debt_count']);
+        $this->assertSame(40.0, $statistics['debt_total']);
+
+        $this->withSession(['env_authenticated' => true])
+            ->get('/studenti')
+            ->assertOk()
+            ->assertSee('Totale pagato')
+            ->assertSee('€ 40,00')
+            ->assertSee('student-stats-'.$student->id, false);
+    }
+
+    public function test_google_calendar_can_be_reconnected_from_the_application(): void
+    {
+        config(['services.google_calendar' => [
+            'enabled' => true,
+            'client_id' => 'client-id.apps.googleusercontent.com',
+            'client_secret' => 'client-secret',
+            'refresh_token' => null,
+            'calendar_id' => 'primary',
+            'timezone' => 'Europe/Rome',
+            'event_prefix' => 'Lezione doposcuola',
+            'reminder_minutes' => 30,
+            'timeout' => 10,
+        ]]);
+
+        $this->withSession(['env_authenticated' => true])
+            ->get('/impostazioni/google-calendar')
+            ->assertOk()
+            ->assertSee('Collega Google Calendar')
+            ->assertSee(route('google-calendar.callback'));
+
+        Http::fake([
+            'oauth2.googleapis.com/token' => Http::response([
+                'access_token' => 'temporary-access-token',
+                'refresh_token' => 'new-refresh-token',
+                'expires_in' => 3600,
+            ]),
+        ]);
+
+        $this->withSession([
+            'env_authenticated' => true,
+            'google_calendar_oauth_state' => 'valid-state',
+        ])->get('/oauth/google-calendar/callback?state=valid-state&code=authorization-code')
+            ->assertRedirect('/impostazioni/google-calendar')
+            ->assertSessionHas('success');
+
+        $connection = GoogleCalendarConnection::query()->findOrFail(1);
+        $this->assertSame('new-refresh-token', $connection->refresh_token);
+        $this->assertNotSame('new-refresh-token', $connection->getRawOriginal('refresh_token'));
+
+        Http::assertSent(fn ($request) => $request->url() === 'https://oauth2.googleapis.com/token'
+            && $request['code'] === 'authorization-code'
+            && $request['redirect_uri'] === route('google-calendar.callback'));
+    }
+
+    public function test_google_calendar_callback_rejects_an_invalid_oauth_state(): void
+    {
+        Http::fake();
+
+        $this->withSession([
+            'env_authenticated' => true,
+            'google_calendar_oauth_state' => 'expected-state',
+        ])->get('/oauth/google-calendar/callback?state=wrong-state&code=authorization-code')
+            ->assertRedirect('/impostazioni/google-calendar')
+            ->assertSessionHas('error');
+
+        Http::assertNothingSent();
     }
 }

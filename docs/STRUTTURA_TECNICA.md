@@ -62,6 +62,10 @@ La tariffa viene copiata dallo studente alla lezione al momento della registrazi
 
 L’importo non è memorizzato: `Lesson::getImportoAttribute()` lo calcola come durata per tariffa solo per le lezioni con stato `svolta`.
 
+### `google_calendar_connections`
+
+Contiene l'unico refresh token Calendar gestito dall'interfaccia e la data dell'ultimo collegamento. Il token non è memorizzato in chiaro: il cast `encrypted` di Eloquent usa `APP_KEY` per cifrarlo e decifrarlo.
+
 ## 5. Aree applicative
 
 ### Autenticazione
@@ -76,6 +80,8 @@ L’importo non è memorizzato: `Lesson::getImportoAttribute()` lo calcola come 
 
 `StudentController` gestisce inserimento, modifica, elenco ed esportazione Excel. `StudentWorkbookExporter` compila `resources/templates/ModelloBase.xlsx` per studente e anno scolastico.
 
+`StudentStatistics` calcola sull'intero storico lezioni svolte, annullate, totale pagato e debiti. Le statistiche vengono caricate insieme all'elenco e mostrate in una modale: il totale pagato comprende le lezioni svolte con data di pagamento, mentre il debito comprende quelle svolte, fatturabili e non ancora saldate.
+
 ### Lezioni
 
 `LessonController` gestisce CRUD, normalizza i dati amministrativi e avvia facoltativamente la sincronizzazione Calendar. Una lezione pagata viene resa automaticamente fatturabile, fatturata e con stato fattura `pagata`.
@@ -89,6 +95,8 @@ L’importo non è memorizzato: `Lesson::getImportoAttribute()` lo calcola come 
 ### Google Calendar
 
 `GoogleCalendarService` usa il refresh token per ottenere un access token temporaneo. Crea un evento quando la lezione non possiede un ID Google e aggiorna l’evento esistente negli altri casi. Un errore remoto non annulla il salvataggio locale della lezione.
+
+`GoogleCalendarConnectionController` e `GoogleCalendarOAuthService` implementano il flusso OAuth web. Dalla pagina `Impostazioni → Google Calendar` l'utente viene inviato al consenso Google e riportato al callback protetto da un valore `state` conservato in sessione. Il refresh token ricevuto viene cifrato tramite `APP_KEY` nella tabella `google_calendar_connections` e ha priorità sull'eventuale valore legacy del `.env`. L'access token temporaneo non viene memorizzato: viene richiesto automaticamente quando serve sincronizzare un evento.
 
 ## 6. Configurazione
 

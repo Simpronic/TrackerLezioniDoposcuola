@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Services\StudentStatistics;
 use App\Services\StudentWorkbookExporter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,13 +15,19 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StudentController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, StudentStatistics $statistics): View
     {
-        $students = Student::withCount('lessons')
+        // Il caricamento anticipato evita una query separata per ogni studente
+        // quando vengono calcolate le statistiche mostrate nelle modali.
+        $students = Student::with('lessons')->withCount('lessons')
             ->when($request->filled('q'), fn ($query) => $query->where(function ($query) use ($request): void {
                 $query->where('nome', 'like', '%'.$request->q.'%')->orWhere('cognome', 'like', '%'.$request->q.'%');
             }))
             ->orderByDesc('attivo')->orderBy('cognome')->orderBy('nome')->paginate(20)->withQueryString();
+
+        $students->getCollection()->each(function (Student $student) use ($statistics): void {
+            $student->setAttribute('statistics', $statistics->for($student));
+        });
 
         // L'anno del registro parte a settembre: gennaio-agosto appartengono
         // all'anno scolastico iniziato nell'anno solare precedente.

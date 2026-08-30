@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\GoogleCalendarConnection;
 use App\Models\Lesson;
 use Carbon\Carbon;
 use Illuminate\Http\Client\PendingRequest;
@@ -50,7 +51,7 @@ class GoogleCalendarService
         $response = Http::asForm()->timeout((int) config('services.google_calendar.timeout', 10))->post(self::TOKEN_URL, [
             'client_id' => config('services.google_calendar.client_id'),
             'client_secret' => config('services.google_calendar.client_secret'),
-            'refresh_token' => config('services.google_calendar.refresh_token'),
+            'refresh_token' => $this->refreshToken(),
             'grant_type' => 'refresh_token',
         ]);
 
@@ -100,10 +101,25 @@ class GoogleCalendarService
             throw new RuntimeException('L’integrazione Google Calendar non è abilitata nel file .env.');
         }
 
-        foreach (['client_id', 'client_secret', 'refresh_token', 'calendar_id'] as $key) {
+        foreach (['client_id', 'client_secret', 'calendar_id'] as $key) {
             if (blank(config("services.google_calendar.{$key}"))) {
                 throw new RuntimeException("Configurazione Google Calendar incompleta: manca {$key} nel file .env.");
             }
         }
+
+        $this->refreshToken();
+    }
+
+    /** Il token collegato dall'interfaccia ha priorità sul valore legacy del .env. */
+    private function refreshToken(): string
+    {
+        $token = GoogleCalendarConnection::query()->find(1)?->refresh_token
+            ?: config('services.google_calendar.refresh_token');
+
+        if (! is_string($token) || $token === '') {
+            throw new RuntimeException('Google Calendar non è collegato. Apri Impostazioni → Google Calendar.');
+        }
+
+        return $token;
     }
 }

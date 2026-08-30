@@ -219,7 +219,7 @@ Il flusso è descritto anche nella [documentazione OAuth per applicazioni web](h
 GOOGLE_CALENDAR_ENABLED=true
 GOOGLE_CALENDAR_CLIENT_ID=client-id.apps.googleusercontent.com
 GOOGLE_CALENDAR_CLIENT_SECRET=client-secret
-GOOGLE_CALENDAR_REFRESH_TOKEN=refresh-token
+GOOGLE_CALENDAR_REFRESH_TOKEN=
 GOOGLE_CALENDAR_ID=primary
 GOOGLE_CALENDAR_TIMEZONE=Europe/Rome
 GOOGLE_CALENDAR_EVENT_PREFIX="Lezione doposcuola"
@@ -228,6 +228,20 @@ GOOGLE_CALENDAR_TIMEOUT=10
 ```
 
 `GOOGLE_CALENDAR_ID=primary` usa il calendario principale dell'account che ha autorizzato l'app. Per un calendario secondario, copiare il relativo ID dalle impostazioni di Google Calendar.
+
+### Collegamento e rinnovo dall'applicazione
+
+Dopo aver configurato client ID e client secret, aprire **Calendar** nel menu dell'applicazione. La pagina mostra l'URI di reindirizzamento da copiare senza modifiche nella Google Cloud Console, tra gli **URI di reindirizzamento autorizzati** del client OAuth di tipo *Applicazione web*. Premere quindi **Collega Google Calendar** e completare il consenso.
+
+Il refresh token ottenuto viene salvato cifrato nella tabella `google_calendar_connections`; `GOOGLE_CALENDAR_REFRESH_TOKEN` resta disponibile solo come compatibilità con la configurazione manuale precedente. Se l'app Google è in stato *Testing* e il refresh token scade, usare **Ricollega Google Calendar** per ripetere il consenso e sostituirlo. Non è possibile rinnovare un refresh token scaduto senza una nuova autorizzazione dell'account Google.
+
+In locale creare la nuova tabella con `php artisan migrate`. Su InfinityFree, dove Artisan non è disponibile, importare prima con phpMyAdmin il file `database/sql/2026_08_30_google_calendar_connections.sql`.
+
+In produzione `APP_URL` deve contenere l'indirizzo HTTPS pubblico esatto, perché Laravel lo usa per generare il callback, per esempio:
+
+```env
+APP_URL=https://trackyourlesson.infinityfree.me
+```
 
 Dopo aver modificato `.env`:
 

@@ -12,6 +12,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!window.confirm(form.dataset.confirm)) event.preventDefault();
   }));
 
+  // Apre e chiude le statistiche del singolo studente usando il dialog nativo.
+  document.querySelectorAll('[data-open-dialog]').forEach(button => button.addEventListener('click', () => {
+    document.getElementById(button.dataset.openDialog)?.showModal();
+  }));
+  document.querySelectorAll('[data-close-dialog]').forEach(button => button.addEventListener('click', () => {
+    button.closest('dialog')?.close();
+  }));
+  document.querySelectorAll('dialog').forEach(dialog => dialog.addEventListener('click', event => {
+    if (event.target === dialog) dialog.close();
+  }));
+
   // Comunica che il registro è in preparazione; il timeout riabilita il pulsante
   // perché un download non provoca una nuova navigazione della pagina corrente.
   document.querySelectorAll('.export-form').forEach(form => form.addEventListener('submit', () => {

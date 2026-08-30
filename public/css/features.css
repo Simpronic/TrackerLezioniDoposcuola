@@ -101,3 +101,173 @@
 @media (max-width: 650px) {
     .billing-summary { grid-template-columns: 1fr; }
 }
+
+.action-button {
+    margin-left: 12px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.student-stats-dialog {
+    width: min(680px, calc(100% - 28px));
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: 0 28px 90px rgba(32, 36, 31, .24);
+}
+
+.student-stats-dialog::backdrop {
+    background: rgba(32, 36, 31, .52);
+    backdrop-filter: blur(3px);
+}
+
+.dialog-heading,
+.dialog-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.dialog-heading h2 {
+    margin: 5px 0 0;
+    font-family: Georgia, serif;
+    font-size: 34px;
+    font-weight: 400;
+}
+
+.dialog-close {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--muted);
+    font-size: 24px;
+    line-height: 1;
+}
+
+.student-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 26px 0;
+}
+
+.student-stats-grid article {
+    min-height: 130px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--paper);
+}
+
+.student-stats-grid article.has-debt {
+    border-color: #e3c891;
+    background: var(--amber-soft);
+}
+
+.student-stats-grid span,
+.student-stats-grid small {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.student-stats-grid span {
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.student-stats-grid strong {
+    display: block;
+    margin: 17px 0 5px;
+    font-family: Georgia, serif;
+    font-size: 30px;
+    font-weight: 400;
+}
+
+.dialog-actions {
+    justify-content: flex-end;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+}
+
+@media (max-width: 650px) {
+    .student-stats-dialog { padding: 20px; }
+    .student-stats-grid { grid-template-columns: 1fr; }
+}
+
+.calendar-settings-card {
+    display: grid;
+    gap: 24px;
+    max-width: 780px;
+    padding: clamp(22px, 4vw, 38px);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+}
+
+.calendar-connection-status {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.calendar-connection-status small {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+}
+
+.connection-dot {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 0 5px var(--amber-soft);
+}
+
+.connection-dot.connected {
+    background: var(--green);
+    box-shadow: 0 0 0 5px var(--green-soft);
+}
+
+.calendar-setup-note {
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+}
+
+.calendar-setup-note h2,
+.calendar-help h2 {
+    margin: 0 0 10px;
+    font-family: Georgia, serif;
+    font-weight: 400;
+}
+
+.calendar-setup-note p,
+.calendar-help p {
+    color: var(--muted);
+    line-height: 1.65;
+}
+
+.calendar-setup-note code {
+    display: block;
+    overflow-wrap: anywhere;
+    padding: 12px;
+    border-radius: 9px;
+    background: var(--paper);
+}
+
+.calendar-help {
+    max-width: 780px;
+    margin-top: 18px;
+}
