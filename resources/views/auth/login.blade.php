@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="it">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Accedi · My Tutor</title><link rel="stylesheet" href="{{ asset('css/app.css') }}"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Accedi · My Tutor</title><link rel="stylesheet" href="{{ asset('css/app.css').'?v='.filemtime(public_path('css/app.css')) }}"></head>
 <body class="login-page">
 <main class="login-card">
     <div class="brand brand-login"><span class="brand-mark">L</span><span>My <em>Tutor</em></span></div>

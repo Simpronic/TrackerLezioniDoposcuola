@@ -4,6 +4,8 @@ Applicazione Laravel per registrare lezioni di doposcuola, studenti, pagamenti, 
 
 La descrizione di architettura, cartelle, database e flussi applicativi è disponibile in [docs/STRUTTURA_TECNICA.md](docs/STRUTTURA_TECNICA.md).
 
+I CSS e JavaScript pubblici ricevono automaticamente un parametro di versione basato sulla data di modifica del file. Dopo un deploy il browser scarica quindi la versione nuova invece di riutilizzare asset obsoleti dalla cache.
+
 ## Funzioni principali
 
 - Gestione di studenti e lezioni.

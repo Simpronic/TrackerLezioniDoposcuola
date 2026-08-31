@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Lezioni in ordine')</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/features.css') }}">
+    {{-- La data di modifica forza browser e CDN a scaricare gli asset aggiornati dopo il deploy. --}}
+    <link rel="stylesheet" href="{{ asset('css/app.css').'?v='.filemtime(public_path('css/app.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/features.css').'?v='.filemtime(public_path('css/features.css')) }}">
 </head>
 <body>
 <header class="site-header">
@@ -27,7 +28,7 @@
     @if($errors->any())<div class="alert error"><strong>Controlla i dati inseriti.</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
     @yield('content')
 </main>
-<script src="{{ asset('js/app.js') }}" defer></script>
+<script src="{{ asset('js/app.js').'?v='.filemtime(public_path('js/app.js')) }}" defer></script>
 @stack('scripts')
 </body>
 </html>
