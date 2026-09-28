@@ -66,7 +66,9 @@ class LessonController extends Controller
     {
         $lezioni->delete();
 
-        return back()->with('success', 'Lezione eliminata.');
+        // Non torniamo alla pagina di modifica: dopo la cancellazione il model
+        // binding non troverebbe più la lezione e Laravel mostrerebbe un 404.
+        return redirect()->route('lezioni.index')->with('success', 'Lezione eliminata.');
     }
 
     private function form(Lesson $lesson): View

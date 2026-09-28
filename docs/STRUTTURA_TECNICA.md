@@ -94,6 +94,8 @@ Contiene l'unico refresh token Calendar gestito dall'interfaccia e la data dell'
 
 ### Google Calendar
 
+`CalendarConnectionStatus` verifica la configurazione e la validità del refresh token tramite Google, con cache di 15 minuti distinta per credenziali. Il compositore della vista `layouts.app` mostra un banner di disconnessione solo quando le notifiche sono abilitate. `calendar_preferences` conserva la preferenza globale anche in assenza di una connessione OAuth; una POST autenticata e protetta da CSRF aggiorna il toggle. Gli errori di rete non vengono interpretati come revoca del consenso.
+
 `GoogleCalendarService` usa il refresh token per ottenere un access token temporaneo. Crea un evento quando la lezione non possiede un ID Google e aggiorna l’evento esistente negli altri casi. Un errore remoto non annulla il salvataggio locale della lezione.
 
 `GoogleCalendarConnectionController` e `GoogleCalendarOAuthService` implementano il flusso OAuth web. Dalla pagina `Impostazioni → Google Calendar` l'utente viene inviato al consenso Google e riportato al callback protetto da un valore `state` conservato in sessione. Il refresh token ricevuto viene cifrato tramite `APP_KEY` nella tabella `google_calendar_connections` e ha priorità sull'eventuale valore legacy del `.env`. L'access token temporaneo non viene memorizzato: viene richiesto automaticamente quando serve sincronizzare un evento.

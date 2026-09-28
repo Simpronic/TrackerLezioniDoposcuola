@@ -271,3 +271,17 @@
     max-width: 780px;
     margin-top: 18px;
 }
+
+.calendar-warning { background: var(--amber-soft); color: var(--ink); }
+.calendar-warning a { text-decoration: underline; font-weight: 700; }
+.calendar-notification-toggle { display: flex; align-items: center; gap: 12px; }
+.calendar-notification-toggle input {
+    appearance: none; width: 44px; height: 26px; min-width: 44px;
+    border-radius: 20px; background: #aaa; padding: 3px; margin: 0; cursor: pointer;
+}
+.calendar-notification-toggle input::before {
+    content: ''; display: block; width: 18px; height: 18px;
+    background: white; border-radius: 50%; transition: transform .15s;
+}
+.calendar-notification-toggle input:checked { background: var(--green); }
+.calendar-notification-toggle input:checked::before { transform: translateX(18px); }

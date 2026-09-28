@@ -3,24 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Models\GoogleCalendarConnection;
+use App\Services\CalendarConnectionStatus;
 use App\Services\GoogleCalendarOAuthService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Throwable;
 
 class GoogleCalendarConnectionController extends Controller
 {
-    public function index(): View
+    public function index(CalendarConnectionStatus $status): View
     {
         return view('settings.google-calendar', [
             'connection' => GoogleCalendarConnection::query()->find(1),
+            'notificationsEnabled' => $status->notificationsEnabled(),
+            'connectionStatus' => $status->check(),
             'hasLegacyToken' => filled(config('services.google_calendar.refresh_token')),
             'redirectUri' => route('google-calendar.callback'),
             'configured' => filled(config('services.google_calendar.client_id'))
                 && filled(config('services.google_calendar.client_secret')),
         ]);
+    }
+
+    public function notifications(Request $request): RedirectResponse
+    {
+        $data = $request->validate(['notifications_enabled' => ['required', 'boolean']]);
+        DB::table('calendar_preferences')->updateOrInsert(['id' => 1], [
+            'notifications_enabled' => (bool) $data['notifications_enabled'],
+        ]);
+
+        return redirect()->route('google-calendar.index')->with('success', 'Preferenza notifiche salvata.');
     }
 
     public function redirect(Request $request, GoogleCalendarOAuthService $oauth): RedirectResponse

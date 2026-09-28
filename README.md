@@ -233,6 +233,10 @@ GOOGLE_CALENDAR_TIMEOUT=10
 
 ### Collegamento e rinnovo dall'applicazione
 
+Le pagine interne mostrano un avviso quando Calendar non è collegato, la configurazione è incompleta o Google rifiuta il refresh token. In **Calendar → Notifiche nell’app**, il toggle e **Salva preferenza** consentono di disattivare o riattivare il banner senza alterare la sincronizzazione. La preferenza è unica per l'app e persiste nel database. Non si tratta di notifiche email o push: il controllo avviene durante la navigazione, con cache di 15 minuti e timeout di 3 secondi. Un errore temporaneo di rete viene mostrato come stato sconosciuto nella pagina Calendar, non come disconnessione.
+
+Per questo aggiornamento eseguire `php artisan migrate` in locale; su InfinityFree importare una sola volta `database/sql/2026_08_31_calendar_preferences.sql` **prima** di caricare il codice. Non sovrascrivere `.env`, `bootstrap/cache` o i file generati in `storage`.
+
 Dopo aver configurato client ID e client secret, aprire **Calendar** nel menu dell'applicazione. La pagina mostra l'URI di reindirizzamento da copiare senza modifiche nella Google Cloud Console, tra gli **URI di reindirizzamento autorizzati** del client OAuth di tipo *Applicazione web*. Premere quindi **Collega Google Calendar** e completare il consenso.
 
 Il refresh token ottenuto viene salvato cifrato nella tabella `google_calendar_connections`; `GOOGLE_CALENDAR_REFRESH_TOKEN` resta disponibile solo come compatibilità con la configurazione manuale precedente. Se l'app Google è in stato *Testing* e il refresh token scade, usare **Ricollega Google Calendar** per ripetere il consenso e sostituirlo. Non è possibile rinnovare un refresh token scaduto senza una nuova autorizzazione dell'account Google.

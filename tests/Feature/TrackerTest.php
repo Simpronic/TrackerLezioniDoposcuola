@@ -49,6 +49,27 @@ class TrackerTest extends TestCase
         $this->assertSame(30.0, $lesson->importo);
     }
 
+    public function test_deleting_a_lesson_redirects_to_the_lesson_list(): void
+    {
+        $student = Student::create([
+            'nome' => 'Ada', 'cognome' => 'Rossi', 'anno_ingresso' => 2026,
+            'attivo' => true, 'tariffa_oraria' => 20,
+        ]);
+        $lesson = Lesson::create([
+            'studente_id' => $student->id, 'data' => '2026-09-28',
+            'ora_inizio' => '15:00', 'ora_fine' => '16:00', 'stato' => 'svolta',
+            'tariffa_oraria_applicata' => 20, 'da_fatturare' => true, 'fatturata' => false,
+        ]);
+
+        $this->withSession(['env_authenticated' => true])
+            ->from(route('lezioni.edit', $lesson))
+            ->delete(route('lezioni.destroy', $lesson))
+            ->assertRedirect(route('lezioni.index'))
+            ->assertSessionHas('success', 'Lezione eliminata.');
+
+        $this->assertDatabaseMissing('lezioni', ['id' => $lesson->id]);
+    }
+
     public function test_student_workbook_is_filled_from_the_template(): void
     {
         $student = Student::create([
