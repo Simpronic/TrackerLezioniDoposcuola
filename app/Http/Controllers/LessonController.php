@@ -108,16 +108,10 @@ class LessonController extends Controller
             // Evita metadati di fattura incoerenti quando il relativo flag è spento.
             $data['numero_fattura'] = $data['data_fattura'] = $data['stato_fattura'] = null;
         }
-        if ($data['fatturata'] || $data['data_pagamento']) {
+        if ($data['fatturata']) {
             // Una lezione già fatturata o pagata deve necessariamente essere fatturabile.
             $data['da_fatturare'] = true;
         }
-        if ($data['data_pagamento']) {
-            // Il pagamento rappresenta lo stato finale del flusso di fatturazione.
-            $data['fatturata'] = true;
-            $data['stato_fattura'] = 'pagata';
-        }
-
         return $data;
     }
 

@@ -1,5 +1,7 @@
 /vendor/
 node_modules/
+.tmp/
+database/*.sqlite
 npm-debug.log
 yarn-error.log
 
@@ -28,3 +30,4 @@ Homestead.json
 .env.production
 .phpactor.json
 auth.json
+/storage/framework/lsp-*.php

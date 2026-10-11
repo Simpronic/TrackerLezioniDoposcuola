@@ -8,6 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Su hosting senza Artisan la tabella può essere stata importata tramite
+        // lo script SQL: in quel caso registriamo la migration senza ricrearla.
+        if (Schema::hasTable('google_calendar_connections')) {
+            return;
+        }
+
         Schema::create('google_calendar_connections', function (Blueprint $table): void {
             // L'app usa un solo account Calendar: una singola riga è sufficiente.
             $table->unsignedTinyInteger('id')->primary();
