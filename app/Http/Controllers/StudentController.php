@@ -68,7 +68,9 @@ class StudentController extends Controller
         }
         $studenti->delete();
 
-        return back()->with('success', 'Studente eliminato.');
+        // Dopo la cancellazione la pagina di modifica non è più raggiungibile:
+        // torniamo all'elenco per evitare un 404 sul model binding.
+        return redirect()->route('studenti.index')->with('success', 'Studente eliminato.');
     }
 
     public function export(Request $request, Student $student, StudentWorkbookExporter $exporter): StreamedResponse

@@ -70,6 +70,22 @@ class TrackerTest extends TestCase
         $this->assertDatabaseMissing('lezioni', ['id' => $lesson->id]);
     }
 
+    public function test_deleting_a_student_redirects_to_the_student_list(): void
+    {
+        $student = Student::create([
+            'nome' => 'Ada', 'cognome' => 'Rossi', 'anno_ingresso' => 2026,
+            'attivo' => true, 'tariffa_oraria' => 20,
+        ]);
+
+        $this->withSession(['env_authenticated' => true])
+            ->from(route('studenti.edit', $student))
+            ->delete(route('studenti.destroy', $student))
+            ->assertRedirect(route('studenti.index'))
+            ->assertSessionHas('success', 'Studente eliminato.');
+
+        $this->assertDatabaseMissing('studenti', ['id' => $student->id]);
+    }
+
     public function test_student_workbook_is_filled_from_the_template(): void
     {
         $student = Student::create([
