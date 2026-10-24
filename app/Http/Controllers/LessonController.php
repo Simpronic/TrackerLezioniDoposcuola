@@ -77,7 +77,7 @@ class LessonController extends Controller
 
         return view('lessons.form', [
             'lesson' => $lesson,
-            'students' => Student::orderByDesc('attivo')->orderBy('cognome')->get(),
+            'students' => Student::where('attivo', true) -> orderByDesc('attivo')->orderBy('cognome')->get(),
             'suggestedInvoiceNumber' => app(InvoiceNumberSuggester::class)->next($invoiceYear),
         ]);
     }
