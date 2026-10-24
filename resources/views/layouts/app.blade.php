@@ -24,7 +24,11 @@
 </header>
 <main class="page-shell">
     @if($showCalendarWarning)
-    <div class="alert calendar-warning" role="status"><strong>Google Calendar non è connesso.</strong> Il collegamento manca, è scaduto oppure la configurazione è incompleta. <a href="{{ route('google-calendar.index') }}">Apri Calendar per ricollegarlo o gestire le notifiche</a>.</div>
+    <div class="alert calendar-warning" role="status">
+        <strong>Google Calendar non è connesso.</strong>
+        Il collegamento manca, è scaduto oppure la configurazione è incompleta.
+        <a href="{{ route('google-calendar.index') }}">Apri Calendar per ricollegarlo o gestire le notifiche</a>.
+    </div>
     @endif
     @if(session('success'))<div class="alert success">{{ session('success') }}</div>@endif
     @if(session('error'))<div class="alert error">{{ session('error') }}</div>@endif
